@@ -125,3 +125,4 @@ if __name__ == "__main__":
     print("Saadan Telegrami...")
     send_telegram(summary)
     print("Valmis!")
+
