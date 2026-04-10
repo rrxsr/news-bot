@@ -17,6 +17,9 @@ def get_news():
         "oil price OPEC commodities gold dollar index FX",
         "China economy property crisis export",
         "Europe ECB energy crisis fiscal policy",
+        "emerging markets currency crisis debt",
+        "tech sector AI earnings Microsoft Apple Nvidia",
+        "banking sector credit risk liquidity",
     ]
     articles = []
     seen = set()
@@ -47,7 +50,7 @@ def get_news():
                 seen.add(title)
                 articles.append(f"- {title}: {desc}")
 
-    return "\n".join(articles[:20])
+    return "\n".join(articles[:30])
 
 # --- Kokkuvõte Groq AI abil ---
 def summarize(news_text):
@@ -57,31 +60,36 @@ def summarize(news_text):
         "Content-Type": "application/json"
     }
 
-    system_prompt = """Sa oled institutsionaalse taseme makromajandusliku ja geopoliitilise analüüsi ekspert.
+    system_prompt = """Sa oled institutsionaalse taseme makromajandusliku ja geopoliitilise analüüsi ekspert, kes aitab ka jaeinvestoreid praktilisi otsuseid tegema.
 
 Sinu ülesanne on filtreerida uudistest välja müra ja tuvastada ainult olulised signaalid.
 
 Reeglid:
-- Ignoreeri üldisi pealkirju nagu "turg tõusis" ilma põhjuseta
-- Eelista uudiseid, mis sisaldavad arve, protsente, tikereid, konkreetseid otsuseid
-- Too välja põhjus-tagajärg seosed (nt "Fed tõstis intressi 0.25% → dollar tugevnes → kullahind langes")
-- Märgi sektorid ja varaklassid mida see mõjutab (equities, bonds, FX, commodities)
-- Kui uudis on spekulatiivne või liiga üldine, jäta see välja
+- Ignoreeri üldisi pealkirju ilma põhjuseta
+- Eelista uudiseid mis sisaldavad arve, protsente, tikereid, konkreetseid otsuseid
+- Too välja põhjus-tagajärg seosed
+- Iga punkti juures märgi signaali suund:
+  ↑ bullish (positiivne mõju varaklassile)
+  ↓ bearish (negatiivne mõju varaklassile)
+  ⚠️ risk (ebaselge või ohtlik olukord)
 
-Vastuse formaat on EESTI KEELES, kolm osa:
+Vastuse formaat on EESTI KEELES, neli osa:
 
 💰 MAKROMAJANDUS
-[2-3 konkreetset punkti numbritega, põhjus-tagajärg loogikaga]
+[2-3 punkti numbritega ja põhjus-tagajärg loogikaga, iga punkti lõpus → mõju varaklassile + suund]
 
 ⚔️ GEOPOLIITILISED RISKID
-[2-3 punkti mis mõjutavad turuhindu, kaubandust või energiat]
+[2-3 punkti mis mõjutavad turuhindu, kaubandust või energiat + suund]
 
-📈 TURULIIKUMISED & INVESTEERIMINE
-[2-3 punkti konkreetsete tikerite, sektorite või varaklassidega]
+📈 TURULIIKUMISED
+[2-3 punkti konkreetsete tikerite, sektorite või varaklassidega + suund]
+
+💡 PRAKTILINE INVESTORInurk
+[1-2 konkreetset nõuannet tänaste uudiste põhjal – mida vaadata, mida vältida, mis sektor/vara võib lähiajal liikuda ja miks. Ole konkreetne – nimeta tikerid, ETF-id või sektorid.]
 
 Iga punkt max 2 lauset. Kui kvaliteetseid uudiseid on vähe, kirjuta vähem – ära täida ruumi müraga."""
 
-    user_prompt = f"""Siin on tänased uudised. Filtreeri välja signaalid:
+    user_prompt = f"""Siin on tänased uudised. Filtreeri välja signaalid ja anna praktiline analüüs:
 
 {news_text}"""
 
@@ -91,7 +99,7 @@ Iga punkt max 2 lauset. Kui kvaliteetseid uudiseid on vähe, kirjuta vähem – 
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-        "max_tokens": 1200,
+        "max_tokens": 1500,
         "temperature": 0.3
     }
     response = requests.post(url, headers=headers, json=body)
