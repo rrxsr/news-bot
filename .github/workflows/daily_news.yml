@@ -1,0 +1,27 @@
+name: Daily News Summary
+
+on:
+  schedule:
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+
+jobs:
+  run-bot:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Installi teegid
+        run: pip install requests
+
+      - name: Käivita uudiste bot
+        run: python news_bot.py
+        env:
+          GROQ_CLOUD: ${{ secrets.GROQ_CLOUD }}
+          NEWS_API: ${{ secrets.NEWS_API }}
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
