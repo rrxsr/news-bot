@@ -31,7 +31,6 @@ def get_news():
             "language": "en",
             "sortBy": "publishedAt",
             "pageSize": 5,
-            "sources": "reuters,bloomberg,the-wall-street-journal,financial-times,associated-press,axios",
             "apiKey": NEWS_API_KEY
         }
         response = requests.get(url, params=params)
@@ -44,7 +43,7 @@ def get_news():
                     continue
                 if title in seen:
                     continue
-                skip_words = ["birthday", "celebrity", "recipe", "sport", "soccer", "nfl", "nba", "sale", "deal", "discount"]
+                skip_words = ["birthday", "celebrity", "recipe", "sport", "soccer", "nfl", "nba", "sale", "deal", "discount", "horoscope", "dating"]
                 if any(w in title.lower() for w in skip_words):
                     continue
                 seen.add(title)
@@ -120,9 +119,9 @@ def send_telegram(message):
 if __name__ == "__main__":
     print("Toon uudiseid...")
     news = get_news()
+    print(f"Leitud {len(news.splitlines())} uudist")
     print("Analüüsin signaale...")
     summary = summarize(news)
     print("Saadan Telegrami...")
     send_telegram(summary)
     print("Valmis!")
-
